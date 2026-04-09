@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Visor de Biblioteca TMO</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "Segoe UI", Arial, sans-serif;
+        background: #1a1a2e;
+        color: #eee;
+        padding: 20px;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      h1 {
+        margin-bottom: 20px;
+        color: #e94560;
+      }
+      .upload-area {
+        background: #16213e;
+        border: 2px dashed #e94560;
+        border-radius: 10px;
+        padding: 30px;
+        text-align: center;
+        margin-bottom: 20px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .upload-area:hover {
+        background: #1a2a4a;
+      }
+      .upload-area.drag-over {
+        border-color: #28a745;
+        background: #1a3a2a;
+      }
+      .file-list {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+      }
+      .file-tab {
+        background: #16213e;
+        padding: 8px 15px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 12px;
+        transition: all 0.2s;
+      }
+      .file-tab.active {
+        background: #e94560;
+        color: white;
+      }
+      .file-tab:hover {
+        background: #e94560;
+        opacity: 0.8;
+      }
+      .controls {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+      .search-box {
+        flex: 1;
+        padding: 10px;
+        border-radius: 25px;
+        border: none;
+        background: #2a2a4a;
+        color: #eee;
+      }
+      .filter-btn {
+        padding: 8px 16px;
+        border-radius: 20px;
+        border: none;
+        cursor: pointer;
+        background: #2a2a4a;
+        color: #ccc;
+      }
+      .filter-btn.active {
+        background: #e94560;
+        color: white;
+      }
+      .stats {
+        background: #16213e;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+      }
+      .stat {
+        flex: 1;
+        text-align: center;
+      }
+      .stat-value {
+        font-size: 24px;
+        font-weight: bold;
+        color: #e94560;
+      }
+      .manga-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 15px;
+      }
+      .manga-card {
+        background: #16213e;
+        border-radius: 10px;
+        padding: 15px;
+        transition: transform 0.2s;
+        cursor: pointer;
+      }
+      .manga-card:hover {
+        transform: translateY(-3px);
+        background: #1e2a4e;
+      }
+      .manga-title {
+        font-weight: bold;
+        font-size: 14px;
+        margin-bottom: 8px;
+        color: #e94560;
+      }
+      .manga-info {
+        font-size: 11px;
+        color: #aaa;
+        margin-top: 8px;
+      }
+      .manga-info span {
+        color: #eee;
+      }
+      .category-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 10px;
+        margin-top: 8px;
+      }
+      .cat-leido {
+        background: #28a745;
+      }
+      .cat-pendiente {
+        background: #ffc107;
+        color: #333;
+      }
+      .cat-siguiendo {
+        background: #17a2b8;
+      }
+      .cat-favorito {
+        background: #e83e8c;
+      }
+      .cat-lo-tengo {
+        background: #6f42c1;
+      }
+      .cat-abandonado {
+        background: #dc3545;
+      }
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+      .modal.active {
+        display: flex;
+      }
+      .modal-content {
+        background: #16213e;
+        border-radius: 15px;
+        max-width: 500px;
+        width: 90%;
+        padding: 20px;
+      }
+      .modal-close {
+        float: right;
+        background: #e94560;
+        border: none;
+        color: white;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+      .loading {
+        text-align: center;
+        padding: 40px;
+        color: #888;
+      }
+      @media (max-width: 768px) {
+        .manga-grid {
+          grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>📚 Visor de Biblioteca TMO</h1>
+
+      <div class="upload-area" id="uploadArea">
+        📂 Arrastra aquí tus archivos (CSV, JSON, SQL, Excel)<br />
+        <small>Puedes subir múltiples archivos a la vez</small>
+      </div>
+
+      <div class="file-list" id="fileList"></div>
+
+      <div class="controls">
+        <input
+          type="text"
+          class="search-box"
+          id="searchBox"
+          placeholder="🔍 Buscar manga..."
+        />
+        <div id="categoryFilters"></div>
+      </div>
+
+      <div class="stats" id="stats"></div>
+
+      <div id="mangaGrid" class="manga-grid"></div>
+    </div>
+
+    <div id="modal" class="modal">
+      <div class="modal-content">
+        <button class="modal-close" onclick="closeModal()">✕</button>
+        <div id="modalBody"></div>
+      </div>
+    </div>
+
+    <script>
+      let allMangas = [];
+      let currentFileIndex = 0;
+      let currentCategory = "todos";
+      let searchTerm = "";
+
+      const CATEGORY_NAMES = {
+        leido: "Leído",
+        pendiente: "Pendiente",
+        siguiendo: "Siguiendo",
+        favorito: "Favorito",
+        lotengo: "Lo tengo",
+        abandonado: "Abandonado",
+      };
+
+      function getCategoryClass(cat) {
+        const map = {
+          Leído: "leido",
+          Pendiente: "pendiente",
+          Siguiendo: "siguiendo",
+          Favorito: "favorito",
+          "Lo tengo": "lotengo",
+          Abandonado: "abandonado",
+        };
+        return map[cat] || "leido";
+      }
+
+      function renderFilters() {
+        const cats = ["todos", ...new Set(allMangas.map((m) => m.categoria))];
+        const html = cats
+          .map(
+            (cat) =>
+              `<button class="filter-btn ${currentCategory === cat ? "active" : ""}" data-cat="${cat}">${cat === "todos" ? "📋 Todos" : CATEGORY_NAMES[cat] || cat}</button>`,
+          )
+          .join("");
+        document.getElementById("categoryFilters").innerHTML = html;
+        document.querySelectorAll(".filter-btn").forEach((btn) => {
+          btn.onclick = () => {
+            currentCategory = btn.dataset.cat;
+            renderMangas();
+            renderFilters();
+          };
+        });
+      }
+
+      function renderMangas() {
+        let filtered = allMangas;
+        if (currentCategory !== "todos")
+          filtered = filtered.filter((m) => m.categoria === currentCategory);
+        if (searchTerm)
+          filtered = filtered.filter((m) =>
+            m.nombre.toLowerCase().includes(searchTerm.toLowerCase()),
+          );
+
+        const total = filtered.length;
+        const porCategoria = {};
+        filtered.forEach(
+          (m) =>
+            (porCategoria[m.categoria] = (porCategoria[m.categoria] || 0) + 1),
+        );
+
+        document.getElementById("stats").innerHTML = `
+            <div class="stat"><div class="stat-value">${total}</div><div>Total mangas</div></div>
+            ${Object.entries(porCategoria)
+              .map(
+                ([cat, count]) =>
+                  `<div class="stat"><div class="stat-value">${count}</div><div>${CATEGORY_NAMES[cat] || cat}</div></div>`,
+              )
+              .join("")}
+        `;
+
+        if (filtered.length === 0) {
+          document.getElementById("mangaGrid").innerHTML =
+            '<div class="loading">😅 No hay mangas que coincidan</div>';
+          return;
+        }
+
+        document.getElementById("mangaGrid").innerHTML = filtered
+          .map(
+            (m) => `
+            <div class="manga-card" onclick='showModal(${JSON.stringify(m).replace(/'/g, "\\'")})'>
+                <div class="manga-title">${m.nombre}</div>
+                <div class="manga-info">📄 ${m.tipo || "Desconocido"}</div>
+                <div class="manga-info">📖 Último capítulo: <span>${m.ultimoCapitulo || "No marcado"}</span></div>
+                <div class="category-badge cat-${getCategoryClass(m.categoria)}">${CATEGORY_NAMES[m.categoria] || m.categoria}</div>
+            </div>
+        `,
+          )
+          .join("");
+      }
+
+      function showModal(manga) {
+        document.getElementById("modalBody").innerHTML = `
+            <h3 style="color:#e94560">${manga.nombre}</h3>
+            <p><strong>📄 Tipo:</strong> ${manga.tipo || "Desconocido"}</p>
+            <p><strong>📂 Categoría:</strong> ${CATEGORY_NAMES[manga.categoria] || manga.categoria}</p>
+            <p><strong>📖 Último capítulo leído:</strong> ${manga.ultimoCapitulo || "No hay capítulos marcados"}</p>
+        `;
+        document.getElementById("modal").classList.add("active");
+      }
+
+      function closeModal() {
+        document.getElementById("modal").classList.remove("active");
+      }
+
+      function parseCSV(text) {
+        const lines = text.split("\n");
+        const headers = lines[0]
+          .split(",")
+          .map((h) => h.replace(/"/g, "").trim().toLowerCase());
+        const nombreIdx = headers.findIndex((h) => h.includes("nombre"));
+        const tipoIdx = headers.findIndex((h) => h.includes("tipo"));
+        const catIdx = headers.findIndex(
+          (h) => h.includes("categoria") || h.includes("categoría"),
+        );
+        const capIdx = headers.findIndex(
+          (h) => h.includes("ultimo") || h.includes("último"),
+        );
+
+        const mangas = [];
+        for (let i = 1; i < lines.length; i++) {
+          if (!lines[i].trim()) continue;
+          const values = lines[i]
+            .split(",")
+            .map((v) => v.replace(/"/g, "").trim());
+          if (values.length < 4) continue;
+          mangas.push({
+            nombre: nombreIdx >= 0 ? values[nombreIdx] : values[0],
+            tipo: tipoIdx >= 0 ? values[tipoIdx] : values[1],
+            categoria: catIdx >= 0 ? values[catIdx] : values[2],
+            ultimoCapitulo: capIdx >= 0 ? values[capIdx] : values[3],
+          });
+        }
+        return mangas;
+      }
+
+      function parseJSON(jsonText) {
+        const data = JSON.parse(jsonText);
+        const mangas = Array.isArray(data) ? data : data.mangas || [];
+        return mangas.map((m) => ({
+          nombre: m.nombre || m.name || "",
+          tipo: m.tipo || m.type || "",
+          categoria: m.categoria || m.category || "",
+          ultimoCapitulo: m.ultimoCapitulo || m.lastChapter || "",
+        }));
+      }
+
+      function parseSQL(sqlText) {
+        const mangas = [];
+        const regex =
+          /INSERT INTO mangas VALUES\(['"]([^'"]+)['"],\s*['"]([^'"]+)['"],\s*['"]([^'"]+)['"],\s*['"]([^'"]+)['"]\)/gi;
+        let match;
+        while ((match = regex.exec(sqlText)) !== null) {
+          mangas.push({
+            nombre: match[1],
+            tipo: match[2],
+            categoria: match[3],
+            ultimoCapitulo: match[4],
+          });
+        }
+        return mangas;
+      }
+
+      async function parseExcel(file) {
+        const XLSX =
+          await import("https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js");
+        const data = await file.arrayBuffer();
+        const workbook = XLSX.read(data);
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const json = XLSX.utils.sheet_to_json(sheet);
+        return json.map((row) => ({
+          nombre: row.nombre || row.Nombre || "",
+          tipo: row.tipo || row.Tipo || "",
+          categoria: row.categoria || row.Categoría || "",
+          ultimoCapitulo: row.ultimoCapitulo || row["Último Capítulo"] || "",
+        }));
+      }
+
+      async function processFiles(files) {
+        allMangas = [];
+        for (const file of files) {
+          const ext = file.name.split(".").pop().toLowerCase();
+          const text = await file.text();
+          let mangas = [];
+          try {
+            if (ext === "csv") mangas = parseCSV(text);
+            else if (ext === "json") mangas = parseJSON(text);
+            else if (ext === "sql") mangas = parseSQL(text);
+            else if (ext === "xlsx") mangas = await parseExcel(file);
+            else continue;
+            allMangas = allMangas.concat(mangas);
+          } catch (e) {
+            console.error(`Error con ${file.name}:`, e);
+          }
+        }
+
+        // Limpiar y eliminar duplicados por nombre
+        const seen = new Set();
+        allMangas = allMangas.filter((m) => {
+          if (!m.nombre) return false;
+          if (seen.has(m.nombre)) return false;
+          seen.add(m.nombre);
+          return true;
+        });
+
+        renderFilters();
+        renderMangas();
+
+        const fileListDiv = document.getElementById("fileList");
+        fileListDiv.innerHTML = files
+          .map((f, i) => `<div class="file-tab">📄 ${f.name}</div>`)
+          .join("");
+      }
+
+      // Drag & drop
+      const uploadArea = document.getElementById("uploadArea");
+      uploadArea.onclick = () => {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.multiple = true;
+        input.accept = ".csv,.json,.sql,.xlsx";
+        input.onchange = (e) => processFiles(Array.from(e.target.files));
+        input.click();
+      };
+      uploadArea.ondragover = (e) => {
+        e.preventDefault();
+        uploadArea.classList.add("drag-over");
+      };
+      uploadArea.ondragleave = () => uploadArea.classList.remove("drag-over");
+      uploadArea.ondrop = (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove("drag-over");
+        processFiles(Array.from(e.dataTransfer.files));
+      };
+
+      document.getElementById("searchBox").oninput = (e) => {
+        searchTerm = e.target.value;
+        renderMangas();
+      };
+
+      document.addEventListener("click", (e) => {
+        if (e.target === document.getElementById("modal")) closeModal();
+      });
+    </script>
+  </body>
+</html>

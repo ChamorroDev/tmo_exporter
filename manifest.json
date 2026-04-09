@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "TMO Exporter",
+  "version": "3.0.0",
+  "description": "Exporta tus mangas de TMO a CSV, JSON y Excel",
+  "permissions": ["activeTab", "downloads"],
+  "host_permissions": ["https://zonatmo.nakamasweb.com/*"],
+  "action": { "default_popup": "popup.html" },
+  "content_scripts": [
+    {
+      "matches": ["https://zonatmo.nakamasweb.com/*"],
+      "js": ["content.js"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["xlsx.full.min.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

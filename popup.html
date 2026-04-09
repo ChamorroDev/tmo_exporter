@@ -1,0 +1,130 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      body {
+        width: 380px;
+        padding: 15px;
+        font-family: Arial, sans-serif;
+      }
+      h3 {
+        margin: 0 0 10px 0;
+        color: #2957ba;
+      }
+      .category {
+        margin: 6px 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .section {
+        margin: 12px 0;
+        padding: 10px;
+        background: #f5f5f5;
+        border-radius: 8px;
+      }
+      .section-title {
+        font-weight: bold;
+        margin-bottom: 8px;
+        font-size: 13px;
+        color: #333;
+      }
+      .format-option {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 5px 0;
+      }
+      button {
+        background: #2957ba;
+        color: white;
+        border: none;
+        padding: 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 10px;
+        font-size: 14px;
+      }
+      button:disabled {
+        background: #ccc;
+      }
+      .loading {
+        display: none;
+        text-align: center;
+        margin-top: 10px;
+        font-size: 12px;
+        color: #2957ba;
+      }
+      .status {
+        margin-top: 10px;
+        padding: 8px;
+        border-radius: 5px;
+        font-size: 12px;
+        display: none;
+      }
+      .error {
+        background: #ffe0e0;
+        color: #d00;
+      }
+      .success {
+        background: #e0ffe0;
+        color: #080;
+      }
+      hr {
+        margin: 10px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h3>📚 TMO Exporter</h3>
+
+    <!-- Categorías -->
+    <div class="category">
+      <input type="checkbox" id="catWatch" checked /> <label>📖 Leído</label>
+    </div>
+    <div class="category">
+      <input type="checkbox" id="catPending" /> <label>⏰ Pendiente</label>
+    </div>
+    <div class="category">
+      <input type="checkbox" id="catFollow" /> <label>▶️ Siguiendo</label>
+    </div>
+    <div class="category">
+      <input type="checkbox" id="catWish" /> <label>❤️ Favorito</label>
+    </div>
+    <div class="category">
+      <input type="checkbox" id="catHave" /> <label>📦 Lo tengo</label>
+    </div>
+    <div class="category">
+      <input type="checkbox" id="catAbandoned" /> <label>💔 Abandonado</label>
+    </div>
+
+    <hr />
+
+    <!-- Formatos de salida -->
+    <div class="section">
+      <div class="section-title">📄 Formatos de exportación</div>
+      <div class="format-option">
+        <input type="checkbox" id="formatCSV" checked />
+        <label>📄 CSV (Excel / Google Sheets)</label>
+      </div>
+      <div class="format-option">
+        <input type="checkbox" id="formatJSON" />
+        <label>🔧 JSON (Programadores)</label>
+      </div>
+      <div class="format-option">
+        <input type="checkbox" id="formatExcel" checked />
+        <label>📊 Excel (.xlsx)</label>
+      </div>
+    </div>
+
+    <button id="exportBtn">🚀 Exportar selección</button>
+    <div id="loading" class="loading">⏳ Procesando...</div>
+    <div id="error" class="status error"></div>
+    <div id="success" class="status success"></div>
+
+    <script src="xlsx.full.min.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>
