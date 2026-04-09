@@ -60,7 +60,6 @@ tmo-exporter/
 └── visor_mangas.html  ← Visor de biblioteca
 ```
 
-*(Si `xlsx.full.min.js` no está incluido en tu descarga, por favor asegúrate de añadirlo a la carpeta).*
 
 ### Paso 3: Cargar en Chrome
 1. Abre `chrome://extensions/` en tu navegador
@@ -196,18 +195,6 @@ tmo-exporter/
 
 ---
 
-## 🐛 Solución de problemas
-
-| Problema | Solución |
-|----------|----------|
-| ❌ No se encuentran mangas | Asegúrate de estar en tu perfil de TMO (`/profile`) |
-| ❌ Error "XLSX no definido" | Asegúrate de que `xlsx.full.min.js` esté en tu carpeta |
-| ❌ No descarga archivos | Revisa que Chrome permita descargas múltiples |
-| ⏳ Tarda mucho | Desmarca categorías innecesarias |
-| 🔄 No detecta último capítulo | Debes marcar capítulos individualmente (icono 👁️) |
-| 🖼️ El visor no carga archivos | Asegúrate de usar CSV/JSON/Excel generados por la extensión |
-
----
 
 ## 🛠️ Desarrollo
 
@@ -228,19 +215,9 @@ tmo-exporter/
 ## 📄 Licencia
 MIT License - Puedes usar, modificar y distribuir libremente.
 
-## 🙏 Agradecimientos
-- SheetJS - Librería para generar archivos Excel
-- Comunidad de TuMangaOnline
 
 ## 📞 Soporte
 Si encuentras algún problema:
 1. Abre un Issue en GitHub
 2. Incluye el error que ves en la consola (F12)
 3. Especifica tu navegador y versión
-
-<div align="center">
-  <br/>
-  Hecho con ❤️ para la comunidad de TMO
-  <br/>
-  <a href="#-tmo-exporter">⬆ Volver arriba</a>
-</div>
